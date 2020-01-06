@@ -1,0 +1,54 @@
+#-*- coding: utf-8 -*-
+"""
+Created on Wed May 22 14:00:59 2019
+
+@author: Arlan
+
+@Desc  : 使用arcpy的令牌读取点几何，多点几何，读取折线和面几何的属性列表
+"""
+
+import os
+import arcpy
+import time
+
+def readAttributes(fc):
+
+    #查看要素的全部属性字段及其类型
+    print("要素的全部属性字段及其类型!")
+    fieldList = arcpy.ListFields(fc)
+    for fld in fieldList:
+        print "%s is a type of %s"  %(fld.name,fld.type)
+        
+    print("--------------------------------------------")
+    
+    #使用旧游标读取
+    print("这是旧游标读取的结果展示!")
+    oldcursor = arcpy.SearchCursor(fc)
+    for row in oldcursor:
+        print("FID:" + str(row.FID))  #通过str()将FID是转为string格式
+        print("name:" + row.name)
+    print("--------------------------------------------")
+
+    
+    #使用新游标读取
+    print("这是新游标读取的结果展示!")
+    #cursor = arcpy.da.SearchCursor(fc,a)
+    with arcpy.da.SearchCursor(fc,["FID","name"]) as newcursor:
+        for row in sorted(newcursor):
+            print("name:" + str(row[0]))  #通过str()将FID是转为string格式
+            print("name:" + row[1])
+
+                                   
+if __name__ == '__main__':
+    print("程序开始运行")
+    s_time=time.time()
+    
+    datadir = r'E:\data\test' #文件根目录
+    pointFile = datadir + os.sep + 'point.shp'#点shp文件名
+
+    readAttributes(pointFile)#读取点几何数据的属性列表
+    
+
+    e_time=time.time()
+    print("程序共耗时： %.2f s!" % (e_time - s_time))
+    
